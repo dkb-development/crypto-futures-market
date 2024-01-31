@@ -1,0 +1,7 @@
+.homePageContainer {
+    padding: 20px;
+    background-color: black;
+    color: white;
+    min-height: 100vh;
+    /* border: 10px solid red; */
+}

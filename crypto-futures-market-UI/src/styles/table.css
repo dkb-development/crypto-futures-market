@@ -1,0 +1,53 @@
+/* src/components/Table.css */
+/* src/components/Table.css */
+
+/* Rest of the styles */
+
+/* Add the following styles for alternating row shades */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+tbody tr:nth-child(odd) {
+  background-color: #3a3737; /* Lighter shade for odd rows */
+}
+
+tbody tr:nth-child(even) {
+  background-color: #000000; /* Darker shade for even rows */
+}
+
+.pagination {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pagination ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+}
+
+.pagination li {
+  margin-right: 5px;
+}
+
+.pagination button {
+  padding: 5px 10px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+.pagination button.active {
+  background-color: #007bff;
+  color: #fff;
+  border: 1px solid #007bff;
+}
+
+.pagination button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}

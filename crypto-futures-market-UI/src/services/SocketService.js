@@ -1,5 +1,8 @@
 import io from "socket.io-client";
 
+const websocketEndpoint = "ws://localhost:5000/";
+
+
 
 class SocketService {
   constructor() {
@@ -8,6 +11,7 @@ class SocketService {
     this.isConnected = false;
     this.ongoingGptResponseEndedCallBack = null;
     this.timeStamp = null;
+    this.updateVolatilityCallback = null;
   }
 
   setCallback(callback) {
@@ -18,8 +22,12 @@ class SocketService {
     this.ongoingGptResponseEndedCallBack = callback;
   }
 
-  connect(socketUrl) {
-    const socket = io(socketUrl, {
+  setUpdateVolatilityCallback(callback){
+    this.updateVolatilityCallback = callback;
+  }
+
+  connect() {
+    const socket = io(websocketEndpoint, {
         transports: ["websocket"],
         cors: {
           origin: 'http://localhost:3000/',
@@ -83,6 +91,10 @@ class SocketService {
         // else the socket will automatically try to reconnect
     });
 
+    socket.on("initialVolatilityResponse", (msg) => {
+      this.updateVolatilityCallback(msg);
+    })
+
     this.socket=socket;
   }
 
@@ -103,6 +115,18 @@ class SocketService {
 
   getTimeStamp(){
     return this.timeStamp;
+  }
+
+  fetchInitialVolatility(symbols) {
+    if(!this.socket || !this.socket.connected){
+      this.connect();
+    }
+
+    if (this.socket && this.socket.active) {
+      this.socket.emit('requestInitialVolatility', symbols);
+    } else {
+      console.error('WebSocket not open. Unable to send message.');
+    }
   }
 }
 

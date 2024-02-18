@@ -1,15 +1,17 @@
 // src/components/Table.js
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import '../styles/table.css'; // Import the CSS file
 
 const Table = ({ data, itemsPerPage, headers }) => {
+  const symbolVolatilityState = useSelector((state) => state.volatility);
   const [allData, setAllData] = useState(data);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: '' });
 
   var indexOfLastItem = currentPage * itemsPerPage;
   var indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const [currentItems, setCurrentItems] = useState(allData.slice(indexOfFirstItem, indexOfLastItem));
+  const [currentItems, setCurrentItems] = useState(allData && allData.slice(indexOfFirstItem, indexOfLastItem));
 
   const totalPages = Math.ceil(allData.length / itemsPerPage);
 
@@ -32,6 +34,10 @@ const Table = ({ data, itemsPerPage, headers }) => {
   };
 
   useEffect(() => {
+    setAllData(Object.values(symbolVolatilityState))
+  }, [symbolVolatilityState])
+
+  useEffect(() => {
     const sortableData = [...allData];
     if (sortConfig.key !== null) {
       sortableData.sort((a, b) => {
@@ -52,7 +58,8 @@ const Table = ({ data, itemsPerPage, headers }) => {
   useEffect(() => {
     indexOfLastItem = currentPage * itemsPerPage;
     indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    setCurrentItems(allData.slice(indexOfFirstItem, indexOfLastItem));
+    setCurrentItems(allData && allData.slice(indexOfFirstItem, indexOfLastItem));
+    console.log("All Data ", allData);
   }, [allData, currentPage])
   
 

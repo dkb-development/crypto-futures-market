@@ -1,27 +1,33 @@
 // src/Volatility.js
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { io } from "socket.io-client";
 import SocketService from '../services/SocketService';
 import { Futures_Symbols } from '../common/Constants';
 
 import '../styles/volatility.css';
 import Table from './Table';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateInitialVolatilityAction } from '../state/volatilityAction';
 
 function Volatility() {
 
+    const dispatch = useDispatch();
+    const symbolVolatilityState = useSelector((state) => state.volatility);
     const [message, setMessage] = useState('');
     const [receivedMessage, setReceivedMessage] = useState('');
+    const [volatilityData, setVolatilityData] = useState([]);
+    const memoizedData = useMemo(() => Object.values(symbolVolatilityState), [symbolVolatilityState]);
+
     const headers = {
         symbol: "symbol", 
-        avg_mov: "avg mov", 
-        curr_mov: "curr mov",
-        avg_vol: "avg vol",
-        curr_vol: "curr vol"
+        avg_mov: "avg mov(%)", 
+        curr_mov: "curr mov(%)",
+        avg_vol: "avg vol(k)",
+        curr_vol: "curr vol(k)"
     };
     const data = [
         {
-            id: 1,
             symbol: "BTCUSDT",
             avg_mov: 0.14,
             curr_mov: 0.29,
@@ -29,7 +35,6 @@ function Volatility() {
             curr_vol: 178
         },
         {
-            id: 2,
             symbol: "ETHUSDT",
             avg_mov: 0.24,
             curr_mov: 0.89,
@@ -37,7 +42,6 @@ function Volatility() {
             curr_vol: 278
         },
         {
-            id: 3,
             symbol: "SOLUSDT",
             avg_mov: 0.34,
             curr_mov: 0.29,
@@ -45,7 +49,6 @@ function Volatility() {
             curr_vol: 178
         },
         {
-            id: 4,
             symbol: "ETCUSDT",
             avg_mov: 0.44,
             curr_mov: 0.89,
@@ -53,7 +56,6 @@ function Volatility() {
             curr_vol: 278
         },
         {
-            id: 5,
             symbol: "WLDUSDT",
             avg_mov: 0.54,
             curr_mov: 0.29,
@@ -61,7 +63,6 @@ function Volatility() {
             curr_vol: 178
         },
         {
-            id: 6,
             symbol: "TRBUSDT",
             avg_mov: 0.64,
             curr_mov: 0.89,
@@ -83,20 +84,29 @@ function Volatility() {
           }
     }
 
+    const updateInitialVolatilityCallback = (symbolDetails) => {
+        dispatch(updateInitialVolatilityAction(symbolDetails));
+    }
+
     useEffect(() => {
-        SocketService.connect('ws://localhost:5000/');
-        fetchInitialVolatility()
+        SocketService.setUpdateVolatilityCallback(updateInitialVolatilityCallback);
+        SocketService.fetchInitialVolatility(Futures_Symbols);
 
         return () => {
             SocketService.disconnect();
         };
     }, []);
 
+    useEffect(() => {
+        // setVolatilityData(Object.values(symbolVolatilityState));
+        // console.log(Object.values(symbolVolatilityState).length);
+    }, [symbolVolatilityState])
+
     return (
     <div className='volatilityPageContainer'>
         <h2>Volatility Page</h2>
         <div className='tableContainer'>
-        <Table data={data} itemsPerPage={2} headers={headers} />
+        <Table data={volatilityData} itemsPerPage={30} headers={headers} />
         </div>
     </div>
     );

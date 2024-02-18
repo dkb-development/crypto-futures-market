@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.post('/fetchInitialVolatility', (req, res) => {
   fetchInitialVolatility();
-  console.log(req.body);
+  console.log(req.body.symbol.length);
   res.json({ message: 'Initial volatility data fetched' });
 });
 

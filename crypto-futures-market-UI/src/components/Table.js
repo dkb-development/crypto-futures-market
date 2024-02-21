@@ -6,6 +6,7 @@ import '../styles/table.css'; // Import the CSS file
 const Table = ({ data, itemsPerPage, headers }) => {
   const symbolVolatilityState = useSelector((state) => state.volatility);
   const [allData, setAllData] = useState(data);
+  const [allSortedData, setAllSortedData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: '' });
 
@@ -34,10 +35,14 @@ const Table = ({ data, itemsPerPage, headers }) => {
   };
 
   useEffect(() => {
-    setAllData(Object.values(symbolVolatilityState))
+    setAllData(Object.values(symbolVolatilityState));
   }, [symbolVolatilityState])
 
   useEffect(() => {
+    updateSortedData();
+  }, [sortConfig]);
+
+  const updateSortedData = () => {
     const sortableData = [...allData];
     if (sortConfig.key !== null) {
       sortableData.sort((a, b) => {
@@ -52,15 +57,19 @@ const Table = ({ data, itemsPerPage, headers }) => {
         return 0;
       });
     }
-    setAllData(sortableData);
-  }, [sortConfig]);
+    setAllSortedData(sortableData);
+  };
+
+  useEffect(() => {
+    updateSortedData();
+  },[allData])
 
   useEffect(() => {
     indexOfLastItem = currentPage * itemsPerPage;
     indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    setCurrentItems(allData && allData.slice(indexOfFirstItem, indexOfLastItem));
-    console.log("All Data ", allData);
-  }, [allData, currentPage])
+    setCurrentItems(allSortedData && allSortedData.slice(indexOfFirstItem, indexOfLastItem));
+    // console.log("All Data ", allData);
+  }, [allSortedData, currentPage, itemsPerPage])
   
 
   const goToPrevPage = () => {
@@ -93,8 +102,8 @@ const Table = ({ data, itemsPerPage, headers }) => {
           </tr>
         </thead>
         <tbody>
-          {currentItems.map((item) => (
-            <tr key={item.id}>
+          {currentItems.map((item, index) => (
+            <tr key={index}>
               {Object.keys(headers).map((key) => (
                 <td key={key}>{item[key.toLowerCase()]}</td>
               ))}

@@ -3,7 +3,7 @@ import axios from 'axios';
 import React, { useEffect, useMemo, useState } from 'react';
 import { io } from "socket.io-client";
 import SocketService from '../services/SocketService';
-import { Futures_Symbols } from '../common/Constants';
+import { backendRestEndpoint, Futures_Symbols } from '../common/Constants.js';
 
 import '../styles/volatility.css';
 import Table from './Table';
@@ -74,7 +74,7 @@ function Volatility() {
     const fetchInitialVolatility = async () => {
         try {
             // Make a POST request using axios
-            const response = await axios.post('http://localhost:8080/api/fetchInitialVolatility', {symbol: Futures_Symbols});
+            const response = await axios.post(backendRestEndpoint+'/fetchInitialVolatility', {symbol: Futures_Symbols});
       
             // Handle the response
             console.log('Response:', response.data);
@@ -86,6 +86,7 @@ function Volatility() {
 
     const updateInitialVolatilityCallback = (symbolDetails) => {
         dispatch(updateInitialVolatilityAction(symbolDetails));
+        console.log(symbolDetails);
     }
 
     useEffect(() => {

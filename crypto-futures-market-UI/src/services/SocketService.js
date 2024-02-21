@@ -1,6 +1,7 @@
 import io from "socket.io-client";
+import { backendSocketEndpoint } from "../common/Constants.js";
 
-const websocketEndpoint = "ws://localhost:5000/";
+const websocketEndpoint = backendSocketEndpoint;
 
 
 
@@ -92,6 +93,10 @@ class SocketService {
     });
 
     socket.on("initialVolatilityResponse", (msg) => {
+      this.updateVolatilityCallback(msg);
+    })
+
+    socket.on("updateVolatility", (msg) => {
       this.updateVolatilityCallback(msg);
     })
 
